@@ -1,29 +1,31 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Regenex Hair — Avaliacao Gratuita</title>
+  <title>Regenex Hair — Free Hair Loss Assessment</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2322C55E'/><text x='16' y='23' font-family='Arial,sans-serif' font-size='20' font-weight='bold' fill='white' text-anchor='middle'>R</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --blue-primary: #1B5EF8;
-      --blue-dark:    #1348CC;
-      --blue-light:   #EBF2FF;
-      --blue-mid:     #C7DCFF;
-      --grey-100:     #F5F7FA;
-      --grey-200:     #E8ECF2;
+      --blue-primary: #22C55E;
+      --blue-dark:    #16A34A;
+      --blue-deeper:  #15803D;
+      --blue-light:   #F0FDF4;
+      --blue-mid:     #BBF7D0;
+      --grey-100:     #F4F5F7;
+      --grey-200:     #E2E6EC;
       --grey-400:     #9AA5B8;
       --grey-600:     #5A6478;
-      --grey-800:     #2C3347;
+      --grey-800:     #1E2A3B;
       --white:        #FFFFFF;
       --green:        #16A34A;
       --radius:       14px;
-      --shadow:       0 4px 24px rgba(27,94,248,.10);
+      --shadow:       0 4px 28px rgba(34,197,94,.13);
     }
 
     body {
@@ -70,7 +72,7 @@
 
     /* ── PROGRESS ── */
     .progress-area {
-      width: 100%; margin-bottom: 24px;
+      width: 100%; margin-bottom: 20px;
     }
     .progress-meta {
       display: flex; justify-content: space-between;
@@ -87,6 +89,18 @@
       transition: width .5s cubic-bezier(.4,0,.2,1);
     }
 
+    /* ── GO BACK ── */
+    .back-btn {
+      width: 100%; display: flex; align-items: center; gap: 5px;
+      background: none; border: none; cursor: pointer;
+      color: var(--grey-400); font-size: .8rem; font-weight: 600;
+      font-family: inherit; padding: 0 0 12px 0;
+      transition: color .2s;
+    }
+    .back-btn:hover { color: var(--grey-600); }
+    .back-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .back-btn.hidden { visibility: hidden; pointer-events: none; }
+
     /* ── CARD ── */
     .card {
       width: 100%;
@@ -94,37 +108,37 @@
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       padding: 36px 32px;
-      animation: fadeUp .4s ease both;
+      animation: fadeUp .35s ease both;
     }
     @keyframes fadeUp {
-      from { opacity:0; transform: translateY(16px); }
-      to   { opacity:1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     .question-label {
-      font-size: .75rem; font-weight: 700;
-      color: var(--blue-primary); letter-spacing: .08em;
+      font-size: .72rem; font-weight: 700;
+      color: var(--blue-primary); letter-spacing: .09em;
       text-transform: uppercase; margin-bottom: 10px;
     }
     .question-text {
-      font-size: 1.25rem; font-weight: 700;
+      font-size: 1.22rem; font-weight: 700;
       color: var(--grey-800); line-height: 1.45;
-      margin-bottom: 28px;
+      margin-bottom: 26px;
     }
 
     /* ── OPTIONS ── */
-    .options { display: flex; flex-direction: column; gap: 12px; }
+    .options { display: flex; flex-direction: column; gap: 11px; }
 
     .option {
       display: flex; align-items: center; gap: 14px;
-      padding: 15px 18px;
+      padding: 14px 18px;
       border: 2px solid var(--grey-200);
       border-radius: 10px;
       cursor: pointer;
       background: var(--white);
-      transition: border-color .2s, background .2s, transform .15s;
-      font-size: .95rem; font-weight: 500; color: var(--grey-800);
-      text-align: left;
+      transition: border-color .18s, background .18s, transform .14s;
+      font-size: .94rem; font-weight: 500; color: var(--grey-800);
+      text-align: left; width: 100%; font-family: 'Playfair Display', Georgia, serif;
     }
     .option:hover {
       border-color: var(--blue-primary);
@@ -136,11 +150,12 @@
       background: var(--blue-light);
     }
     .option-bullet {
-      width: 22px; height: 22px; min-width: 22px;
+      width: 21px; height: 21px; min-width: 21px;
       border-radius: 50%;
       border: 2px solid var(--grey-400);
       display: flex; align-items: center; justify-content: center;
-      transition: border-color .2s, background .2s;
+      transition: border-color .18s, background .18s;
+      flex-shrink: 0;
     }
     .option.selected .option-bullet {
       border-color: var(--blue-primary);
@@ -148,49 +163,32 @@
     }
     .option.selected .option-bullet::after {
       content: '';
-      width: 8px; height: 8px;
+      width: 7px; height: 7px;
       background: white; border-radius: 50%;
     }
 
     /* ── YES/NO ── */
-    .yn-options { display: flex; gap: 16px; }
+    .yn-options { display: flex; gap: 14px; }
     .yn-btn {
-      flex: 1; padding: 20px 10px;
+      flex: 1; padding: 22px 10px;
       border-radius: 12px; border: 2.5px solid var(--grey-200);
       background: var(--white); cursor: pointer;
-      font-size: 1.05rem; font-weight: 700;
+      font-size: 1rem; font-weight: 700; font-family: inherit;
       transition: all .2s;
       display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: var(--grey-800);
     }
     .yn-btn .yn-icon { font-size: 1.8rem; }
     .yn-btn.yes:hover, .yn-btn.yes.selected {
       border-color: var(--blue-primary); background: var(--blue-light);
-      color: var(--blue-primary);
+      color: var(--blue-dark);
       transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(27,94,248,.18);
+      box-shadow: 0 6px 22px rgba(34,197,94,.20);
     }
     .yn-btn.no:hover, .yn-btn.no.selected {
       border-color: var(--grey-400); background: var(--grey-100);
       color: var(--grey-600);
     }
-
-    /* ── NEXT BTN ── */
-    .btn-next {
-      width: 100%; margin-top: 28px;
-      padding: 16px;
-      background: var(--blue-primary);
-      color: white; font-size: 1rem; font-weight: 700;
-      border: none; border-radius: 10px; cursor: pointer;
-      letter-spacing: .02em;
-      transition: background .2s, transform .15s, box-shadow .2s;
-      display: none;
-    }
-    .btn-next:hover {
-      background: var(--blue-dark);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(27,94,248,.30);
-    }
-    .btn-next.visible { display: block; }
 
     /* ── INTERMEDIATE MESSAGE ── */
     .mid-card {
@@ -200,7 +198,7 @@
       box-shadow: var(--shadow);
       padding: 40px 32px;
       text-align: center;
-      animation: fadeUp .5s ease both;
+      animation: fadeUp .45s ease both;
     }
     .mid-icon {
       width: 72px; height: 72px;
@@ -213,9 +211,9 @@
     .mid-badge {
       display: inline-block;
       background: #DCFCE7; color: var(--green);
-      font-size: .78rem; font-weight: 700;
+      font-size: .76rem; font-weight: 700;
       padding: 4px 12px; border-radius: 99px;
-      letter-spacing: .06em; text-transform: uppercase;
+      letter-spacing: .07em; text-transform: uppercase;
       margin-bottom: 16px;
     }
     .mid-title {
@@ -225,8 +223,8 @@
     }
     .mid-title span { color: var(--blue-primary); }
     .mid-body {
-      font-size: .98rem; color: var(--grey-600);
-      line-height: 1.65; margin-bottom: 28px;
+      font-size: .96rem; color: var(--grey-600);
+      line-height: 1.68; margin-bottom: 24px;
     }
     .mid-highlights {
       display: flex; flex-direction: column; gap: 10px;
@@ -235,7 +233,7 @@
     }
     .mid-highlight-item {
       display: flex; align-items: center; gap: 10px;
-      font-size: .9rem; font-weight: 500; color: var(--grey-800);
+      font-size: .88rem; font-weight: 500; color: var(--grey-800);
     }
     .mid-highlight-item .dot {
       width: 8px; height: 8px; min-width: 8px;
@@ -244,14 +242,14 @@
     .btn-continue {
       width: 100%; padding: 16px;
       background: var(--blue-primary); color: white;
-      font-size: 1rem; font-weight: 700;
+      font-size: 1rem; font-weight: 700; font-family: inherit;
       border: none; border-radius: 10px; cursor: pointer;
       transition: background .2s, transform .15s, box-shadow .2s;
     }
     .btn-continue:hover {
       background: var(--blue-dark);
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(27,94,248,.30);
+      box-shadow: 0 8px 24px rgba(34,197,94,.30);
     }
 
     /* ── FINAL RESULT ── */
@@ -262,27 +260,25 @@
       box-shadow: var(--shadow);
       padding: 40px 32px;
       text-align: center;
-      animation: fadeUp .5s ease both;
+      animation: fadeUp .45s ease both;
     }
-    .result-icon {
-      font-size: 3rem; margin-bottom: 16px;
-    }
+    .result-icon { font-size: 3rem; margin-bottom: 16px; }
     .result-badge {
       display: inline-block;
       background: #DCFCE7; color: var(--green);
-      font-size: .78rem; font-weight: 700;
+      font-size: .76rem; font-weight: 700;
       padding: 4px 14px; border-radius: 99px;
-      letter-spacing: .06em; text-transform: uppercase;
+      letter-spacing: .07em; text-transform: uppercase;
       margin-bottom: 18px;
     }
     .result-title {
-      font-size: 1.55rem; font-weight: 800;
+      font-size: 1.5rem; font-weight: 800;
       color: var(--grey-800); line-height: 1.35; margin-bottom: 14px;
     }
     .result-title span { color: var(--blue-primary); }
     .result-body {
-      font-size: .96rem; color: var(--grey-600);
-      line-height: 1.7; margin-bottom: 28px;
+      font-size: .94rem; color: var(--grey-600);
+      line-height: 1.72; margin-bottom: 26px;
     }
     .result-features {
       display: grid; grid-template-columns: 1fr 1fr;
@@ -291,25 +287,24 @@
     .result-feature {
       background: var(--blue-light);
       border-radius: 10px; padding: 14px 12px;
-      font-size: .85rem; font-weight: 600; color: var(--blue-dark);
+      font-size: .83rem; font-weight: 600; color: var(--blue-dark);
       text-align: center;
     }
     .result-feature .f-icon { font-size: 1.3rem; display: block; margin-bottom: 4px; }
     .btn-cta {
       width: 100%; padding: 18px;
       background: var(--blue-primary); color: white;
-      font-size: 1.05rem; font-weight: 800;
+      font-size: 1.05rem; font-weight: 800; font-family: inherit;
       border: none; border-radius: 10px; cursor: pointer;
       transition: background .2s, transform .15s, box-shadow .2s;
-      letter-spacing: .01em;
     }
     .btn-cta:hover {
       background: var(--blue-dark);
       transform: translateY(-2px);
-      box-shadow: 0 10px 28px rgba(27,94,248,.35);
+      box-shadow: 0 10px 28px rgba(34,197,94,.35);
     }
     .cta-sub {
-      font-size: .8rem; color: var(--grey-400);
+      font-size: .79rem; color: var(--grey-400);
       margin-top: 12px;
     }
 
@@ -318,18 +313,18 @@
       width: 100%; max-width: 660px;
       padding: 0 16px;
       display: flex; justify-content: center; gap: 24px;
-      flex-wrap: wrap; margin-top: 28px;
+      flex-wrap: wrap; margin-top: 24px;
     }
     .trust-item {
       display: flex; align-items: center; gap: 6px;
-      font-size: .78rem; color: var(--grey-400); font-weight: 500;
+      font-size: .77rem; color: var(--grey-400); font-weight: 500;
     }
     .trust-item svg { width: 14px; height: 14px; flex-shrink: 0; }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 480px) {
-      .card, .mid-card, .result-card { padding: 28px 20px; }
-      .question-text { font-size: 1.1rem; }
+      .card, .mid-card, .result-card { padding: 26px 18px; }
+      .question-text { font-size: 1.08rem; }
       .result-features { grid-template-columns: 1fr; }
       .yn-options { flex-direction: column; }
     }
@@ -352,8 +347,12 @@
   <!-- MAIN -->
   <main class="wrapper">
     <div class="progress-area" id="progressArea">
+      <button class="back-btn hidden" id="backBtn" onclick="goBack()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        Go back
+      </button>
       <div class="progress-meta">
-        <span id="progressLabel">Pergunta 1 de 13</span>
+        <span id="progressLabel">Question 1 of 13</span>
         <span id="progressPct">0%</span>
       </div>
       <div class="progress-bar-bg">
@@ -368,180 +367,148 @@
   <div class="trust-bar">
     <div class="trust-item">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-      100% seguro e gratuito
+      100% safe &amp; free
     </div>
     <div class="trust-item">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-      Suas respostas sao privadas
+      Your answers are private
     </div>
     <div class="trust-item">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-      Leva menos de 2 minutos
+      Takes less than 2 minutes
     </div>
   </div>
 
   <script>
     const QUESTIONS = [
-      // ── Q1–Q7: regular multiple choice ──
       {
-        id: 1,
-        type: 'choice',
-        text: 'Qual e a sua faixa etaria?',
+        id: 1, type: 'choice',
+        text: 'What is your age range?',
+        options: ['18 to 29 years old', '30 to 39 years old', '40 to 49 years old', '50 years or older'],
+      },
+      {
+        id: 2, type: 'choice',
+        text: 'How long have you been noticing hair loss?',
+        options: ['Less than 6 months', 'Between 6 months and 1 year', 'Between 1 and 3 years', 'More than 3 years'],
+      },
+      {
+        id: 3, type: 'choice',
+        text: 'How would you describe the intensity of your hair loss?',
         options: [
-          '18 a 29 anos',
-          '30 a 39 anos',
-          '40 a 49 anos',
-          '50 anos ou mais',
+          'Mild — a few extra hairs in the drain',
+          'Moderate — clearly more than normal',
+          'Heavy — large amounts of hair falling out',
+          'Severe — visible bald patches or spots',
         ],
       },
       {
-        id: 2,
-        type: 'choice',
-        text: 'Ha quanto tempo voce esta percebendo a queda de cabelo?',
+        id: 4, type: 'choice',
+        text: 'Where do you notice the most hair loss?',
+        options: ['On the top of my head', 'At the hairline / temples', 'All over', 'On the sides'],
+      },
+      {
+        id: 5, type: 'choice',
+        text: 'Has hair loss affected your self-esteem or confidence?',
         options: [
-          'Ha menos de 6 meses',
-          'Entre 6 meses e 1 ano',
-          'Entre 1 e 3 anos',
-          'Ha mais de 3 anos',
+          'Yes, it affects my daily life a lot',
+          'Sometimes it bothers me quite a bit',
+          'Rarely, but I\'ve thought about it',
+          'I haven\'t noticed any impact yet',
         ],
       },
       {
-        id: 3,
-        type: 'choice',
-        text: 'Como voce descreveria a intensidade da sua queda de cabelo?',
+        id: 6, type: 'choice',
+        text: 'Does anyone in your family also suffer from hair loss?',
+        options: ["Yes, on my father's side", "Yes, on my mother's side", 'Yes, on both sides', 'Not that I know of'],
+      },
+      {
+        id: 7, type: 'choice',
+        text: 'Have you tried any hair loss treatment before?',
         options: [
-          'Leve — alguns fios a mais no ralo',
-          'Moderada — claramente mais que o normal',
-          'Intensa — grande volume de cabelos caindo',
-          'Severa — falhas ou areas visiveis sem cabelo',
+          'Yes, but without satisfactory results',
+          'Yes, but I stopped due to side effects',
+          'Yes, with some partial results',
+          'I\'ve never tried any treatment',
         ],
       },
       {
-        id: 4,
-        type: 'choice',
-        text: 'Em quais regioes voce percebe mais a queda?',
+        id: 8, type: 'choice',
+        text: 'Do you notice a lot of hair falling out during showers or when brushing?',
         options: [
-          'No topo da cabeca',
-          'Na testa / entradas',
-          'Em toda a extensao',
-          'Nas laterais',
+          'Yes, I lose a lot of hair during those moments',
+          'Yes, but moderately',
+          'Rarely',
+          "I don't notice hair loss during those moments",
         ],
       },
       {
-        id: 5,
-        type: 'choice',
-        text: 'A queda de cabelo ja afetou sua autoestima ou confianca?',
+        id: 9, type: 'choice',
+        text: 'How is your hair density today compared to 2 years ago?',
+        options: ['Much thinner and sparser', 'A little thinner', 'About the same', "I've noticed some improvement"],
+      },
+      {
+        id: 10, type: 'choice',
+        text: 'Would you be willing to dedicate a few minutes a day to a 100% natural treatment with no side effects?',
         options: [
-          'Sim, afeta muito o meu dia a dia',
-          'As vezes me incomoda bastante',
-          'Raramente, mas ja pensei nisso',
-          'Ainda nao percebi impacto',
+          'Yes, absolutely!',
+          'Depends on how much time it requires',
+          "Maybe, if it's easy to apply",
+          "I'd prefer something more practical",
         ],
       },
       {
-        id: 6,
-        type: 'choice',
-        text: 'Alguem na sua familia tambem sofre com queda de cabelo?',
-        options: [
-          'Sim, do lado paterno',
-          'Sim, do lado materno',
-          'Sim, dos dois lados',
-          'Nao que eu saiba',
-        ],
+        id: 11, type: 'yesno',
+        text: 'Would you like to have access to a treatment that can help your hair start growing again in just 3 weeks?',
       },
       {
-        id: 7,
-        type: 'choice',
-        text: 'Voce ja tentou algum tratamento para queda de cabelo antes?',
-        options: [
-          'Sim, mas sem resultado satisfatorio',
-          'Sim, mas parei por efeitos colaterais',
-          'Sim, com algum resultado parcial',
-          'Nunca tentei nenhum tratamento',
-        ],
-      },
-      // ── Q8–Q10: regular multiple choice ──
-      {
-        id: 8,
-        type: 'choice',
-        text: 'Voce percebe muita queda durante o banho ou ao pentear?',
-        options: [
-          'Sim, perco muito cabelo nesses momentos',
-          'Sim, mas de forma moderada',
-          'Raramente',
-          'Nao percebo queda nesses momentos',
-        ],
+        id: 12, type: 'yesno',
+        text: 'If there was a proven method to recover your hair density in up to 21 days, would you be interested in learning about it?',
       },
       {
-        id: 9,
-        type: 'choice',
-        text: 'Como esta a densidade do seu cabelo hoje, comparado a 2 anos atras?',
-        options: [
-          'Muito mais fino e ralo',
-          'Um pouco mais fino',
-          'Esta igual',
-          'Percebi alguma melhora',
-        ],
-      },
-      {
-        id: 10,
-        type: 'choice',
-        text: 'Voce estaria disposto a dedicar alguns minutos por dia a um tratamento 100% natural e sem efeitos colaterais?',
-        options: [
-          'Sim, com certeza!',
-          'Depende de quanto tempo exige',
-          'Talvez, se for facil de aplicar',
-          'Prefiro algo mais pratico',
-        ],
-      },
-      // ── Q11–Q13: YES/NO ──
-      {
-        id: 11,
-        type: 'yesno',
-        text: 'Voce gostaria de ter acesso a um tratamento capaz de ajudar seu cabelo a voltar a crescer em apenas 3 semanas?',
-      },
-      {
-        id: 12,
-        type: 'yesno',
-        text: 'Se existisse um metodo comprovado para recuperar a densidade do seu cabelo em ate 90 dias, voce teria interesse em conhece-lo?',
-      },
-      {
-        id: 13,
-        type: 'yesno',
-        text: 'Voce gostaria de receber agora um plano personalizado e gratuito para comecar a reverter a sua queda de cabelo ainda esta semana?',
+        id: 13, type: 'yesno',
+        text: 'Would you like to get access to the full Regenex Hair treatment and start reversing your hair loss this very week?',
       },
     ];
 
-    const INTERMEDIATE_AFTER = 7; // show message after Q7
+    const INTERMEDIATE_AFTER = 7; // show mid-message after step index 6 (Q7)
 
-    let currentStep = 0; // 0-based index into QUESTIONS
-    let showingMid = false;
-    let answers = {};
+    let currentStep = 0;
+    let stepHistory = []; // stack of previous steps { step, wasMid }
+    let showingMid  = false;
+    let answers     = {};
+    let advancing   = false; // debounce rapid clicks
 
-    const container   = document.getElementById('quizContainer');
+    const container    = document.getElementById('quizContainer');
     const progressArea = document.getElementById('progressArea');
-    const progressFill  = document.getElementById('progressFill');
-    const progressLabel = document.getElementById('progressLabel');
-    const progressPct   = document.getElementById('progressPct');
+    const progressFill = document.getElementById('progressFill');
+    const progressLabel= document.getElementById('progressLabel');
+    const progressPct  = document.getElementById('progressPct');
+    const backBtn      = document.getElementById('backBtn');
 
     function updateProgress(qNumber) {
       const pct = Math.round(((qNumber - 1) / QUESTIONS.length) * 100);
       progressFill.style.width = pct + '%';
-      progressLabel.textContent = 'Pergunta ' + qNumber + ' de ' + QUESTIONS.length;
-      progressPct.textContent = pct + '%';
+      progressLabel.textContent = 'Question ' + qNumber + ' of ' + QUESTIONS.length;
+      progressPct.textContent   = pct + '%';
+    }
+
+    function showBack(visible) {
+      backBtn.classList.toggle('hidden', !visible);
     }
 
     function renderQuestion(index) {
+      if (index < 0) return;
       const q = QUESTIONS[index];
       updateProgress(q.id);
+      showBack(stepHistory.length > 0);
+      advancing = false;
 
       if (q.type === 'choice') {
         container.innerHTML = `
           <div class="card">
-            <div class="question-label">Pergunta ${q.id} de ${QUESTIONS.length}</div>
+            <div class="question-label">Question ${q.id} of ${QUESTIONS.length}</div>
             <div class="question-text">${q.text}</div>
             <div class="options" id="options"></div>
-            <button class="btn-next" id="btnNext" onclick="handleNext()">Continuar &rarr;</button>
           </div>`;
 
         const opts = document.getElementById('options');
@@ -549,120 +516,178 @@
           const btn = document.createElement('button');
           btn.className = 'option';
           btn.innerHTML = `<div class="option-bullet"></div><span>${opt}</span>`;
-          btn.onclick = () => selectOption(btn, i, q.id);
+          btn.onclick = () => selectAndAdvance(btn, i, q.id);
           opts.appendChild(btn);
         });
+
+        // restore selection if going back
+        if (answers[q.id] !== undefined) {
+          const allOpts = document.querySelectorAll('.option');
+          if (allOpts[answers[q.id]]) allOpts[answers[q.id]].classList.add('selected');
+        }
       } else {
-        // YES/NO
         container.innerHTML = `
           <div class="card">
-            <div class="question-label">Pergunta ${q.id} de ${QUESTIONS.length}</div>
+            <div class="question-label">Question ${q.id} of ${QUESTIONS.length}</div>
             <div class="question-text">${q.text}</div>
             <div class="yn-options">
-              <button class="yn-btn yes" onclick="handleYesNo('sim', ${q.id})">
+              <button class="yn-btn yes" onclick="handleYesNo('yes', ${q.id})">
                 <span class="yn-icon">&#x1F44D;</span>
-                Sim, quero!
+                Yes, I want that!
               </button>
-              <button class="yn-btn no" onclick="handleYesNo('nao', ${q.id})">
+              <button class="yn-btn no" onclick="handleYesNo('no', ${q.id})">
                 <span class="yn-icon">&#x274C;</span>
-                Nao
+                No
               </button>
             </div>
           </div>`;
       }
     }
 
-    function selectOption(btn, idx, qId) {
+    function selectAndAdvance(btn, idx, qId) {
+      if (advancing) return;
+      advancing = true;
+
       document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
       btn.classList.add('selected');
       answers[qId] = idx;
-      const nextBtn = document.getElementById('btnNext');
-      if (nextBtn) nextBtn.classList.add('visible');
-    }
 
-    function handleNext() {
-      currentStep++;
-      if (currentStep === INTERMEDIATE_AFTER) {
-        showMidMessage();
-      } else {
-        renderQuestion(currentStep);
-      }
-    }
-
-    function handleYesNo(val, qId) {
-      answers[qId] = val;
       setTimeout(() => {
+        stepHistory.push({ step: currentStep, wasMid: false });
         currentStep++;
-        if (currentStep >= QUESTIONS.length) {
-          if (val === 'sim') {
-            showResult();
-          } else {
-            showResult(); // show result regardless; CTA copy adapts
-          }
+        if (currentStep === INTERMEDIATE_AFTER) {
+          showMidMessage();
         } else {
           renderQuestion(currentStep);
         }
-      }, 280);
+      }, 320);
+    }
+
+    function handleYesNo(val, qId) {
+      if (advancing) return;
+      advancing = true;
+      answers[qId] = val;
+
+      // flash selection
+      const btn = document.querySelector('.yn-btn.' + (val === 'yes' ? 'yes' : 'no'));
+      if (btn) btn.classList.add('selected');
+
+      setTimeout(() => {
+        stepHistory.push({ step: currentStep, wasMid: false });
+        currentStep++;
+        if (currentStep >= QUESTIONS.length) {
+          showResult();
+        } else {
+          renderQuestion(currentStep);
+        }
+      }, 300);
     }
 
     function showMidMessage() {
       progressArea.style.display = 'none';
+      showBack(false);
+      advancing = false;
       container.innerHTML = `
         <div class="mid-card">
           <div class="mid-icon">&#x1F4A1;</div>
-          <div class="mid-badge">Analise Concluida</div>
-          <div class="mid-title">Parece que a sua situacao <span>tem solucao!</span></div>
+          <div class="mid-badge">Analysis Almost Complete</div>
+          <div class="mid-title">It looks like your situation <span>can be fixed!</span></div>
           <p class="mid-body">
-            Com base nas suas respostas, identificamos que voce apresenta um perfil de queda compativel com
-            condicoes altamente responsivas a tratamentos modernos. A boa noticia e que esse tipo de queda
-            pode ser revertido com a abordagem certa.
+            Based on your answers, you show a hair loss profile that is highly responsive
+            to modern treatments. The good news — this type of hair loss can often be
+            reversed with the right approach, even if previous treatments have failed you.
           </p>
           <div class="mid-highlights">
-            <div class="mid-highlight-item"><div class="dot"></div> Queda com causa identificavel e tratavel</div>
-            <div class="mid-highlight-item"><div class="dot"></div> Perfil compativel com recuperacao rapida dos fios</div>
-            <div class="mid-highlight-item"><div class="dot"></div> Alta chance de resultado visivel em poucas semanas</div>
+            <div class="mid-highlight-item"><div class="dot"></div>Hair loss with an identifiable and treatable cause</div>
+            <div class="mid-highlight-item"><div class="dot"></div>Profile compatible with fast follicle recovery</div>
+            <div class="mid-highlight-item"><div class="dot"></div>High chance of visible results within 3 weeks</div>
           </div>
-          <button class="btn-continue" onclick="continueMid()">Ver meu plano personalizado &rarr;</button>
+          <button class="btn-continue" onclick="continueMid()">See the full treatment &rarr;</button>
         </div>`;
     }
 
     function continueMid() {
+      stepHistory.push({ step: null, wasMid: true });
+      progressArea.style.display = 'block';
+      renderQuestion(currentStep);
+    }
+
+    function goBack() {
+      if (stepHistory.length === 0) return;
+      const prev = stepHistory.pop();
+
+      if (prev.wasMid) {
+        // going back into the mid message
+        currentStep = INTERMEDIATE_AFTER;
+        progressArea.style.display = 'none';
+        showBack(false);
+        advancing = false;
+        container.innerHTML = `
+          <div class="mid-card">
+            <div class="mid-icon">&#x1F4A1;</div>
+            <div class="mid-badge">Analysis Almost Complete</div>
+            <div class="mid-title">It looks like your situation <span>can be fixed!</span></div>
+            <p class="mid-body">
+              Based on your answers, you show a hair loss profile that is highly responsive
+              to modern treatments. The good news — this type of hair loss can often be
+              reversed with the right approach, even if previous treatments have failed you.
+            </p>
+            <div class="mid-highlights">
+              <div class="mid-highlight-item"><div class="dot"></div>Hair loss with an identifiable and treatable cause</div>
+              <div class="mid-highlight-item"><div class="dot"></div>Profile compatible with fast follicle recovery</div>
+              <div class="mid-highlight-item"><div class="dot"></div>High chance of visible results within 3 weeks</div>
+            </div>
+            <button class="btn-continue" onclick="continueMid()">See the full treatment &rarr;</button>
+          </div>`;
+        return;
+      }
+
+      currentStep = prev.step;
       progressArea.style.display = 'block';
       renderQuestion(currentStep);
     }
 
     function showResult() {
       progressArea.style.display = 'none';
+      showBack(false);
       container.innerHTML = `
         <div class="result-card">
           <div class="result-icon">&#x1F3C6;</div>
-          <div class="result-badge">Voce e um Candidato Ideal</div>
-          <div class="result-title">Seu cabelo <span>pode crescer de novo</span> em ate 3 semanas</div>
+          <div class="result-badge">You Are an Ideal Candidate</div>
+          <div class="result-title">Your hair <span>can grow back</span> in as little as 3 weeks</div>
           <p class="result-body">
-            Parabens por concluir a avaliacao! Com base no seu perfil, o Regenex Hair pode ajudar
-            a estimular os foliculos inativos e reverter a queda. Nosso protocolo e natural, sem efeitos
-            colaterais e com resultados documentados em menos de 30 dias para a maioria dos usuarios.
+            Congratulations on completing the assessment! Based on your profile, Regenex Hair
+            is designed to stimulate dormant follicles and reverse hair loss at the root.
+            Our protocol is 100% natural, with no side effects — and most users report
+            visible results in under 30 days.
           </p>
           <div class="result-features">
             <div class="result-feature"><span class="f-icon">&#x1F33F;</span>100% Natural</div>
-            <div class="result-feature"><span class="f-icon">&#x23F1;</span>Resultados em 3 semanas</div>
-            <div class="result-feature"><span class="f-icon">&#x1F4C4;</span>Plano personalizado</div>
-            <div class="result-feature"><span class="f-icon">&#x1F512;</span>Sem efeitos colaterais</div>
+            <div class="result-feature"><span class="f-icon">&#x23F1;</span>Results in 3 weeks</div>
+            <div class="result-feature"><span class="f-icon">&#x1F46B;</span>Fit for Men and Women</div>
+            <div class="result-feature"><span class="f-icon">&#x2705;</span>No side effects</div>
           </div>
           <button class="btn-cta" onclick="handleCTA()">
-            Quero meu plano gratuito agora &rarr;
+            Get the full treatment now &rarr;
           </button>
-          <p class="cta-sub">Acesso limitado &bull; Sem cartao de credito &bull; 100% gratuito</p>
+          <p class="cta-sub">Limited access &bull; Secure checkout &bull; Results in 3 weeks</p>
         </div>`;
     }
 
     function handleCTA() {
-      // Redirect or open lead capture — customize this URL
-      alert('Em breve voce sera redirecionado para o seu plano personalizado!');
+      // TODO: replace with actual redirect or lead capture
+      window.location.href = 'https://pay.hotmart.com/R104643182T?checkoutMode=10';
     }
 
     // ── INIT ──
     renderQuestion(0);
+
+    // ── BACK BUTTON REDIRECT ──
+    history.pushState(null, '', location.href);
+    window.addEventListener('popstate', function() {
+      history.pushState(null, '', location.href);
+      window.location.replace('https://pay.hotmart.com/D100173663W?checkoutMode=10');
+    });
   </script>
 </body>
 </html>

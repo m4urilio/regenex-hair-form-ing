@@ -375,313 +375,450 @@
   </div>
 
   <script>
-    const QUESTIONS = [
-      {
-        id: 1, type: 'choice',
+    // ─────────────────────────────────────────────
+    //  ADAPTIVE QUIZ ENGINE
+    //  Every question's text, options and next step
+    //  are resolved against accumulated answers.
+    // ─────────────────────────────────────────────
+
+    var TOTAL_Q = 13;
+    var CHECKOUT = 'https://pay.hotmart.com/R104643182T?checkoutMode=10';
+
+    // answers keyed by question id
+    // q1 = gender index (0=male,1=female,2=prefer not to say)
+    // q2 = age index
+    // q3 = duration index
+    // q4 = intensity index
+    // q5 = location index
+    // q6m/q6f = branched q6
+    // q7 = emotional impact index
+    // q8a/q8b = branched q8
+    // q9 = family history index
+    // q10 = previous treatment index
+    // q11/q12/q13 = yesno (0=yes,1=no)
+
+    var A = {};       // answers
+    var qHistory = []; // breadcrumb of visited question IDs
+    var currentQId = 'q1';
+    var advancing  = false;
+
+    function isFemale() { return A.q1 === 1; }
+    function dur()      { return A.q3 || 0; }  // 0=<6mo 1=6-12mo 2=1-3yr 3=3yr+
+    function sev()      { return A.q4 || 0; }  // 0=mild … 3=severe
+    function impact()   { return A.q7 !== undefined ? A.q7 : 2; } // 0=a lot … 3=not really
+    function prev()     { return A.q10 !== undefined ? A.q10 : 3; } // 0=no result 1=side effects 2=partial 3=never
+
+    var Q = {
+
+      q1: {
+        text: "Let's personalize this for you. What is your gender?",
+        type: 'choice',
+        options: ['Male', 'Female', 'Prefer not to say'],
+        next: function() { return 'q2'; }
+      },
+
+      q2: {
         text: 'What is your age range?',
-        options: ['18 to 29 years old', '30 to 39 years old', '40 to 49 years old', '50 years or older'],
+        type: 'choice',
+        options: ['18–29 years old', '30–39 years old', '40–49 years old', '50 years or older'],
+        next: function() { return 'q3'; }
       },
-      {
-        id: 2, type: 'choice',
+
+      q3: {
         text: 'How long have you been noticing hair loss?',
-        options: ['Less than 6 months', 'Between 6 months and 1 year', 'Between 1 and 3 years', 'More than 3 years'],
+        type: 'choice',
+        options: ['Less than 6 months', '6 months to 1 year', '1 to 3 years', 'More than 3 years'],
+        next: function() { return 'q4'; }
       },
-      {
-        id: 3, type: 'choice',
-        text: 'How would you describe the intensity of your hair loss?',
+
+      q4: {
+        text: function() {
+          return dur() >= 2
+            ? "Given that you've been dealing with this for a while — how would you describe the intensity today?"
+            : 'How would you describe the intensity of your hair loss?';
+        },
+        type: 'choice',
         options: [
-          'Mild — a few extra hairs in the drain',
+          'Mild — a few extra hairs here and there',
           'Moderate — clearly more than normal',
-          'Heavy — large amounts of hair falling out',
-          'Severe — visible bald patches or spots',
+          'Heavy — large amounts falling out',
+          'Severe — visible bald patches or spots'
         ],
+        next: function() { return 'q5'; }
       },
-      {
-        id: 4, type: 'choice',
+
+      q5: {
         text: 'Where do you notice the most hair loss?',
-        options: ['On the top of my head', 'At the hairline / temples', 'All over', 'On the sides'],
+        type: 'choice',
+        options: ['Top or crown of my head', 'Hairline or temples', 'All over — diffuse thinning', 'On the sides'],
+        next: function() { return isFemale() ? 'q6f' : 'q6m'; }
       },
-      {
-        id: 5, type: 'choice',
-        text: 'Has hair loss affected your self-esteem or confidence?',
-        options: [
-          'Yes, it affects my daily life a lot',
-          'Sometimes it bothers me quite a bit',
-          'Rarely, but I\'ve thought about it',
-          'I haven\'t noticed any impact yet',
-        ],
-      },
-      {
-        id: 6, type: 'choice',
-        text: 'Does anyone in your family also suffer from hair loss?',
-        options: ["Yes, on my father's side", "Yes, on my mother's side", 'Yes, on both sides', 'Not that I know of'],
-      },
-      {
-        id: 7, type: 'choice',
-        text: 'Have you tried any hair loss treatment before?',
-        options: [
-          'Yes, but without satisfactory results',
-          'Yes, but I stopped due to side effects',
-          'Yes, with some partial results',
-          'I\'ve never tried any treatment',
-        ],
-      },
-      {
-        id: 8, type: 'choice',
-        text: 'Do you notice a lot of hair falling out during showers or when brushing?',
-        options: [
-          'Yes, I lose a lot of hair during those moments',
-          'Yes, but moderately',
-          'Rarely',
-          "I don't notice hair loss during those moments",
-        ],
-      },
-      {
-        id: 9, type: 'choice',
-        text: 'How is your hair density today compared to 2 years ago?',
-        options: ['Much thinner and sparser', 'A little thinner', 'About the same', "I've noticed some improvement"],
-      },
-      {
-        id: 10, type: 'choice',
-        text: 'Would you be willing to dedicate a few minutes a day to a 100% natural treatment with no side effects?',
-        options: [
-          'Yes, absolutely!',
-          'Depends on how much time it requires',
-          "Maybe, if it's easy to apply",
-          "I'd prefer something more practical",
-        ],
-      },
-      {
-        id: 11, type: 'yesno',
-        text: 'Would you like to have access to a treatment that can help your hair start growing again in just 3 weeks?',
-      },
-      {
-        id: 12, type: 'yesno',
-        text: 'If there was a proven method to recover your hair density in up to 21 days, would you be interested in learning about it?',
-      },
-      {
-        id: 13, type: 'yesno',
-        text: 'Would you like to get access to the full Regenex Hair treatment and start reversing your hair loss this very week?',
-      },
-    ];
 
-    const INTERMEDIATE_AFTER = 7; // show mid-message after step index 6 (Q7)
+      // ── Q6 — MALE branch ──
+      q6m: {
+        text: function() {
+          var loc = A.q5 || 0;
+          if (loc === 0) return 'Besides losing hair — has the crown area also become visibly thinner or finer?';
+          if (loc === 1) return 'Beyond your hairline — has your hair overall become thinner and finer too?';
+          return 'Has your hair become thinner and finer all over, or mainly falling in one area?';
+        },
+        type: 'choice',
+        options: [
+          'Yes — noticeably thinner and finer',
+          'A little bit thinner, yes',
+          'Mainly falling, not much thinner',
+          "I'm not sure"
+        ],
+        next: function() { return 'q7'; }
+      },
 
-    let currentStep = 0;
-    let stepHistory = []; // stack of previous steps { step, wasMid }
-    let showingMid  = false;
-    let answers     = {};
-    let advancing   = false; // debounce rapid clicks
+      // ── Q6 — FEMALE branch ──
+      q6f: {
+        text: 'Do you think your hair loss may be connected to any of the following?',
+        type: 'choice',
+        options: [
+          'Pregnancy or postpartum changes',
+          'Menopause or hormonal shifts',
+          'A period of high stress',
+          "I'm not sure of the cause"
+        ],
+        next: function() { return 'q7'; }
+      },
 
-    const container    = document.getElementById('quizContainer');
-    const progressArea = document.getElementById('progressArea');
-    const progressFill = document.getElementById('progressFill');
-    const progressLabel= document.getElementById('progressLabel');
-    const progressPct  = document.getElementById('progressPct');
-    const backBtn      = document.getElementById('backBtn');
+      // ── Q7 — Emotional impact (gender + severity adaptive) ──
+      q7: {
+        text: function() {
+          if (isFemale() && sev() >= 2) return 'Has the hair loss started affecting how you feel about your appearance or your confidence as a woman?';
+          if (isFemale())               return 'Has hair loss made you feel less confident or self-conscious about your appearance?';
+          if (sev() >= 2)               return 'Has the hair loss started impacting your confidence or how you present yourself?';
+          return 'Has hair loss affected your self-esteem or confidence in any way?';
+        },
+        type: 'choice',
+        options: [
+          "Yes — it affects me daily and is hard to ignore",
+          "Sometimes it weighs on me more than I'd like",
+          'Rarely — but it does cross my mind',
+          "Not really — I'm mainly focused on prevention"
+        ],
+        next: function() { return impact() <= 1 ? 'q8a' : 'q8b'; }
+      },
 
-    function updateProgress(qNumber) {
-      const pct = Math.round(((qNumber - 1) / QUESTIONS.length) * 100);
-      progressFill.style.width = pct + '%';
-      progressLabel.textContent = 'Question ' + qNumber + ' of ' + QUESTIONS.length;
-      progressPct.textContent   = pct + '%';
+      // ── Q8a — High emotional impact ──
+      q8a: {
+        text: function() {
+          return isFemale()
+            ? "We hear that a lot. What bothers you most on a day-to-day basis?"
+            : "That's completely understandable. What affects you most day-to-day?";
+        },
+        type: 'choice',
+        options: function() {
+          return isFemale()
+            ? ['Avoiding photos or social events', 'Spending extra time styling to cover it', 'Feeling less attractive or feminine', 'Fear it will keep getting worse']
+            : ['Avoiding photos or social situations', 'Feeling less confident professionally', 'Feeling less attractive or youthful', 'Fear it will keep getting worse'];
+        },
+        next: function() { return 'q9'; }
+      },
+
+      // ── Q8b — Lower emotional impact ──
+      q8b: {
+        text: function() {
+          return isFemale()
+            ? "If you could have thicker, fuller hair again — what would that change for you?"
+            : "If you could recover your hair density — what would that mean for you?";
+        },
+        type: 'choice',
+        options: function() {
+          return isFemale()
+            ? ["I'd feel much more confident in how I look", "I'd stop worrying about it getting worse", "I'd spend less time trying to cover it up", 'It would give me peace of mind']
+            : ["I'd feel more confident and look younger", "I'd stop worrying about it getting worse", "I'd feel better in professional and social settings", 'It would give me peace of mind'];
+        },
+        next: function() { return 'q9'; }
+      },
+
+      // ── Q9 — Family history ──
+      q9: {
+        text: 'Does anyone in your immediate family also experience hair loss?',
+        type: 'choice',
+        options: ["Yes — on my father's side", "Yes — on my mother's side", 'Yes — on both sides', "Not that I'm aware of"],
+        next: function() { return 'q10'; }
+      },
+
+      // ── Q10 — Previous treatments → triggers mid message ──
+      q10: {
+        text: 'Have you ever tried any treatment for hair loss before?',
+        type: 'choice',
+        options: [
+          "Yes — but without satisfactory results",
+          'Yes — but stopped due to side effects',
+          'Yes — with some partial improvement',
+          'No — this would be my first treatment'
+        ],
+        next: function() { return 'MID'; }
+      },
+
+      // ── Q11 — Adaptive opener (based on treatment history + gender) ──
+      q11: {
+        text: function() {
+          if (prev() === 0) return isFemale()
+            ? "What if previous treatments didn't work because they weren't designed for your specific hair profile? Would you be open to something truly targeted?"
+            : "Most treatments fail because they're generic. What if there was a protocol designed specifically for your type of hair loss? Would you try it?";
+          if (prev() === 1) return "What if you found a 100% natural treatment — no chemicals, zero side effects — that actually delivered results? Would you give it a chance?";
+          if (prev() === 2) return "What if you could build on those partial results with a complete protocol that finally takes you to full recovery? Interested?";
+          return isFemale()
+            ? "If you could start a completely natural, side-effect-free treatment this week and see results in 3 weeks — would you be open to trying?"
+            : "If you could start a proven, natural treatment this week and see real results in 3 weeks — would you give it a try?";
+        },
+        type: 'yesno',
+        next: function() { return 'q12'; }
+      },
+
+      // ── Q12 — Commitment (based on duration + severity + gender) ──
+      q12: {
+        text: function() {
+          if (dur() >= 2 && sev() >= 2) return isFemale()
+            ? "Even after years of hair loss — would you commit just 5 minutes a day to finally get it back?"
+            : "Even after years of hair loss — would you commit to a simple 5-minute daily routine if it meant real, visible results?";
+          if (dur() >= 2) return "You've been dealing with this for a while. If a proven solution could reverse it in 21 days — would you take that chance?";
+          return "Would you be willing to dedicate just a few minutes a day to a natural treatment that could show results in under a month?";
+        },
+        type: 'yesno',
+        next: function() { return 'q13'; }
+      },
+
+      // ── Q13 — Final CTA softener (gender + impact adaptive) ──
+      q13: {
+        text: function() {
+          if (isFemale() && impact() <= 1) return "Are you ready to take back your confidence — starting with your hair, starting this week?";
+          if (isFemale())                  return "Are you ready to take the first real step toward thicker, healthier hair?";
+          if (impact() <= 1)               return "Are you ready to stop watching it happen and actually do something about it — starting today?";
+          return "Are you ready to take control and start Regenex this week?";
+        },
+        type: 'yesno',
+        next: function() { return 'RESULT'; }
+      }
+    };
+
+    // ─────────────────────────────────────────────
+    //  DOM references
+    // ─────────────────────────────────────────────
+    var container    = document.getElementById('quizContainer');
+    var progressArea = document.getElementById('progressArea');
+    var progressFill = document.getElementById('progressFill');
+    var progressLabel= document.getElementById('progressLabel');
+    var progressPct  = document.getElementById('progressPct');
+    var backBtn      = document.getElementById('backBtn');
+
+    function resolve(val) {
+      return typeof val === 'function' ? val() : val;
     }
 
-    function showBack(visible) {
-      backBtn.classList.toggle('hidden', !visible);
+    function qNum() {
+      return qHistory.length + 1;
     }
 
-    function renderQuestion(index) {
-      if (index < 0) return;
-      const q = QUESTIONS[index];
-      updateProgress(q.id);
-      showBack(stepHistory.length > 0);
+    function updateProgress() {
+      var n   = qNum();
+      var pct = Math.round(((n - 1) / TOTAL_Q) * 100);
+      progressFill.style.width   = pct + '%';
+      progressLabel.textContent  = 'Question ' + n + ' of ' + TOTAL_Q;
+      progressPct.textContent    = pct + '%';
+    }
+
+    function showBack(vis) {
+      backBtn.classList.toggle('hidden', !vis);
+    }
+
+    // ─────────────────────────────────────────────
+    //  Render a question by ID
+    // ─────────────────────────────────────────────
+    function renderQuestion(qId) {
+      var q    = Q[qId];
+      var text = resolve(q.text);
+      var num  = qNum();
+
+      updateProgress();
+      showBack(qHistory.length > 0);
       advancing = false;
 
       if (q.type === 'choice') {
-        container.innerHTML = `
-          <div class="card">
-            <div class="question-label">Question ${q.id} of ${QUESTIONS.length}</div>
-            <div class="question-text">${q.text}</div>
-            <div class="options" id="options"></div>
-          </div>`;
+        var opts = resolve(q.options);
+        container.innerHTML =
+          '<div class="card">' +
+            '<div class="question-label">Question ' + num + ' of ' + TOTAL_Q + '</div>' +
+            '<div class="question-text">' + text + '</div>' +
+            '<div class="options" id="options"></div>' +
+          '</div>';
 
-        const opts = document.getElementById('options');
-        q.options.forEach((opt, i) => {
-          const btn = document.createElement('button');
+        var optsEl = document.getElementById('options');
+        opts.forEach(function(opt, i) {
+          var btn = document.createElement('button');
           btn.className = 'option';
-          btn.innerHTML = `<div class="option-bullet"></div><span>${opt}</span>`;
-          btn.onclick = () => selectAndAdvance(btn, i, q.id);
-          opts.appendChild(btn);
+          if (A[qId] === i) btn.classList.add('selected');
+          btn.innerHTML = '<div class="option-bullet"></div><span>' + opt + '</span>';
+          btn.onclick   = function() { selectAndAdvance(btn, i, qId); };
+          optsEl.appendChild(btn);
         });
 
-        // restore selection if going back
-        if (answers[q.id] !== undefined) {
-          const allOpts = document.querySelectorAll('.option');
-          if (allOpts[answers[q.id]]) allOpts[answers[q.id]].classList.add('selected');
-        }
       } else {
-        container.innerHTML = `
-          <div class="card">
-            <div class="question-label">Question ${q.id} of ${QUESTIONS.length}</div>
-            <div class="question-text">${q.text}</div>
-            <div class="yn-options">
-              <button class="yn-btn yes" onclick="handleYesNo('yes', ${q.id})">
-                <span class="yn-icon">&#x1F44D;</span>
-                Yes, I want that!
-              </button>
-              <button class="yn-btn no" onclick="handleYesNo('no', ${q.id})">
-                <span class="yn-icon">&#x274C;</span>
-                No
-              </button>
-            </div>
-          </div>`;
+        // yes/no
+        container.innerHTML =
+          '<div class="card">' +
+            '<div class="question-label">Question ' + num + ' of ' + TOTAL_Q + '</div>' +
+            '<div class="question-text">' + text + '</div>' +
+            '<div class="yn-options">' +
+              '<button class="yn-btn yes" onclick="handleYesNo(\'yes\',\'' + qId + '\')">' +
+                '<span class="yn-icon">&#x1F44D;</span>Yes, I want that!' +
+              '</button>' +
+              '<button class="yn-btn no" onclick="handleYesNo(\'no\',\'' + qId + '\')">' +
+                '<span class="yn-icon">&#x274C;</span>No' +
+              '</button>' +
+            '</div>' +
+          '</div>';
       }
     }
 
+    // ─────────────────────────────────────────────
+    //  Navigation
+    // ─────────────────────────────────────────────
     function selectAndAdvance(btn, idx, qId) {
       if (advancing) return;
       advancing = true;
-
-      document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+      document.querySelectorAll('.option').forEach(function(o) { o.classList.remove('selected'); });
       btn.classList.add('selected');
-      answers[qId] = idx;
+      A[qId] = idx;
 
-      setTimeout(() => {
-        stepHistory.push({ step: currentStep, wasMid: false });
-        currentStep++;
-        if (currentStep === INTERMEDIATE_AFTER) {
-          showMidMessage();
-        } else {
-          renderQuestion(currentStep);
-        }
+      setTimeout(function() {
+        var nextId = Q[qId].next();
+        qHistory.push(currentQId);
+        currentQId = nextId;
+        if (nextId === 'MID') showMidMessage();
+        else renderQuestion(nextId);
       }, 320);
     }
 
     function handleYesNo(val, qId) {
       if (advancing) return;
       advancing = true;
-      answers[qId] = val;
+      A[qId] = (val === 'yes') ? 0 : 1;
+      var sel = document.querySelector('.yn-btn.' + (val === 'yes' ? 'yes' : 'no'));
+      if (sel) sel.classList.add('selected');
 
-      // flash selection
-      const btn = document.querySelector('.yn-btn.' + (val === 'yes' ? 'yes' : 'no'));
-      if (btn) btn.classList.add('selected');
-
-      setTimeout(() => {
-        stepHistory.push({ step: currentStep, wasMid: false });
-        currentStep++;
-        if (currentStep >= QUESTIONS.length) {
-          showResult();
-        } else {
-          renderQuestion(currentStep);
-        }
+      setTimeout(function() {
+        var nextId = Q[qId].next();
+        qHistory.push(currentQId);
+        currentQId = nextId;
+        if (nextId === 'RESULT') showResult();
+        else renderQuestion(nextId);
       }, 300);
     }
 
+    function goBack() {
+      if (qHistory.length === 0) return;
+      var prevId = qHistory.pop();
+      currentQId = prevId;
+      if (prevId === 'MID') { showMidMessage(); return; }
+      progressArea.style.display = 'block';
+      renderQuestion(prevId);
+    }
+
+    // ─────────────────────────────────────────────
+    //  Mid message — fully adaptive
+    // ─────────────────────────────────────────────
     function showMidMessage() {
       progressArea.style.display = 'none';
       showBack(false);
       advancing = false;
-      container.innerHTML = `
-        <div class="mid-card">
-          <div class="mid-icon">&#x1F4A1;</div>
-          <div class="mid-badge">Analysis Almost Complete</div>
-          <div class="mid-title">It looks like your situation <span>can be fixed!</span></div>
-          <p class="mid-body">
-            Based on your answers, you show a hair loss profile that is highly responsive
-            to modern treatments. The good news — this type of hair loss can often be
-            reversed with the right approach, even if previous treatments have failed you.
-          </p>
-          <div class="mid-highlights">
-            <div class="mid-highlight-item"><div class="dot"></div>Hair loss with an identifiable and treatable cause</div>
-            <div class="mid-highlight-item"><div class="dot"></div>Profile compatible with fast follicle recovery</div>
-            <div class="mid-highlight-item"><div class="dot"></div>High chance of visible results within 3 weeks</div>
-          </div>
-          <button class="btn-continue" onclick="continueMid()">See the full treatment &rarr;</button>
-        </div>`;
+
+      var titleInner = (sev() >= 2)
+        ? (isFemale() ? 'treatable — even at this stage' : 'a treatable hair loss profile')
+        : 'strong recovery potential';
+
+      var body = isFemale()
+        ? (sev() >= 2
+            ? "Many women with a profile like yours — even with significant hair loss — have seen remarkable results with the right targeted treatment. The key is addressing the root cause, not masking symptoms."
+            : "Based on what you've shared, your hair loss is at a stage where natural intervention is highly effective. The sooner you act, the better your results will be.")
+        : (sev() >= 2
+            ? "Men with a profile like yours often see strong results when the right protocol is applied in time. The follicles are still active — they just need the right stimulus to wake up."
+            : "Based on your answers, your hair follicles are likely still viable and responsive. Natural stimulation at this stage can make a significant difference.");
+
+      var h1 = (prev() === 0)
+        ? 'Root cause identified — previous treatments missed this'
+        : 'Hair loss profile with a clear, addressable cause';
+      var h3 = (dur() >= 2)
+        ? 'Recovery possible even after extended hair loss'
+        : 'High likelihood of visible results within 3 weeks';
+
+      container.innerHTML =
+        '<div class="mid-card">' +
+          '<div class="mid-icon">&#x1F4A1;</div>' +
+          '<div class="mid-badge">Analysis Almost Complete</div>' +
+          '<div class="mid-title">Your profile shows <span>' + titleInner + '</span></div>' +
+          '<p class="mid-body">' + body + '</p>' +
+          '<div class="mid-highlights">' +
+            '<div class="mid-highlight-item"><div class="dot"></div>' + h1 + '</div>' +
+            '<div class="mid-highlight-item"><div class="dot"></div>Follicle profile compatible with rapid recovery</div>' +
+            '<div class="mid-highlight-item"><div class="dot"></div>' + h3 + '</div>' +
+          '</div>' +
+          '<button class="btn-continue" onclick="continueMid()">See your personalized treatment &rarr;</button>' +
+        '</div>';
     }
 
     function continueMid() {
-      stepHistory.push({ step: null, wasMid: true });
+      qHistory.push('MID');
+      currentQId = 'q11';
       progressArea.style.display = 'block';
-      renderQuestion(currentStep);
+      renderQuestion('q11');
     }
 
-    function goBack() {
-      if (stepHistory.length === 0) return;
-      const prev = stepHistory.pop();
-
-      if (prev.wasMid) {
-        // going back into the mid message
-        currentStep = INTERMEDIATE_AFTER;
-        progressArea.style.display = 'none';
-        showBack(false);
-        advancing = false;
-        container.innerHTML = `
-          <div class="mid-card">
-            <div class="mid-icon">&#x1F4A1;</div>
-            <div class="mid-badge">Analysis Almost Complete</div>
-            <div class="mid-title">It looks like your situation <span>can be fixed!</span></div>
-            <p class="mid-body">
-              Based on your answers, you show a hair loss profile that is highly responsive
-              to modern treatments. The good news — this type of hair loss can often be
-              reversed with the right approach, even if previous treatments have failed you.
-            </p>
-            <div class="mid-highlights">
-              <div class="mid-highlight-item"><div class="dot"></div>Hair loss with an identifiable and treatable cause</div>
-              <div class="mid-highlight-item"><div class="dot"></div>Profile compatible with fast follicle recovery</div>
-              <div class="mid-highlight-item"><div class="dot"></div>High chance of visible results within 3 weeks</div>
-            </div>
-            <button class="btn-continue" onclick="continueMid()">See the full treatment &rarr;</button>
-          </div>`;
-        return;
-      }
-
-      currentStep = prev.step;
-      progressArea.style.display = 'block';
-      renderQuestion(currentStep);
-    }
-
+    // ─────────────────────────────────────────────
+    //  Result — fully adaptive
+    // ─────────────────────────────────────────────
     function showResult() {
       progressArea.style.display = 'none';
       showBack(false);
-      container.innerHTML = `
-        <div class="result-card">
-          <div class="result-icon">&#x1F3C6;</div>
-          <div class="result-badge">You Are an Ideal Candidate</div>
-          <div class="result-title">Your hair <span>can grow back</span> in as little as 3 weeks</div>
-          <p class="result-body">
-            Congratulations on completing the assessment! Based on your profile, Regenex Hair
-            is designed to stimulate dormant follicles and reverse hair loss at the root.
-            Our protocol is 100% natural, with no side effects — and most users report
-            visible results in under 30 days.
-          </p>
-          <div class="result-features">
-            <div class="result-feature"><span class="f-icon">&#x1F33F;</span>100% Natural</div>
-            <div class="result-feature"><span class="f-icon">&#x23F1;</span>Results in 3 weeks</div>
-            <div class="result-feature"><span class="f-icon">&#x1F46B;</span>Fit for Men and Women</div>
-            <div class="result-feature"><span class="f-icon">&#x2705;</span>No side effects</div>
-          </div>
-          <button class="btn-cta" onclick="handleCTA()">
-            Get the full treatment now &rarr;
-          </button>
-          <p class="cta-sub">Limited access &bull; Secure checkout &bull; Results in 3 weeks</p>
-        </div>`;
+
+      var title, body;
+      if (isFemale()) {
+        title = (impact() <= 1)
+          ? 'Your hair <span>can grow back</span> — and your confidence with it'
+          : 'Your hair <span>can grow back</span> in as little as 3 weeks';
+        body  = 'Congratulations on completing the assessment! Based on your profile, Regenex Hair is formulated to address the specific causes of hair loss in women — stimulating dormant follicles and restoring thickness at the root. 100% natural, zero side effects, and most women report visible improvement in under 30 days.';
+      } else {
+        title = (sev() >= 2)
+          ? "It's not too late — your hair <span>can grow back</span>"
+          : 'Your hair <span>can grow back</span> in as little as 3 weeks';
+        body  = "Congratulations on completing the assessment! Based on your profile, Regenex Hair is designed to reactivate dormant follicles and reverse hair loss at the source — 100% natural, with no side effects. Most users report visible results in under 30 days.";
+      }
+
+      container.innerHTML =
+        '<div class="result-card">' +
+          '<div class="result-icon">&#x1F3C6;</div>' +
+          '<div class="result-badge">You Are an Ideal Candidate</div>' +
+          '<div class="result-title">' + title + '</div>' +
+          '<p class="result-body">' + body + '</p>' +
+          '<div class="result-features">' +
+            '<div class="result-feature"><span class="f-icon">&#x1F33F;</span>100% Natural</div>' +
+            '<div class="result-feature"><span class="f-icon">&#x23F1;</span>Results in 3 weeks</div>' +
+            '<div class="result-feature"><span class="f-icon">&#x1F46B;</span>For Men &amp; Women</div>' +
+            '<div class="result-feature"><span class="f-icon">&#x2705;</span>No side effects</div>' +
+          '</div>' +
+          '<button class="btn-cta" onclick="handleCTA()">Get the full treatment now &rarr;</button>' +
+          '<p class="cta-sub">Limited access &bull; Secure checkout &bull; Results in 3 weeks</p>' +
+        '</div>';
     }
 
     function handleCTA() {
-      // TODO: replace with actual redirect or lead capture
-      window.location.href = 'https://pay.hotmart.com/R104643182T?checkoutMode=10';
+      window.location.href = CHECKOUT;
     }
 
     // ── INIT ──
-    renderQuestion(0);
+    renderQuestion('q1');
 
     // ── BACK BUTTON REDIRECT ──
     history.pushState(null, '', location.href);
     window.addEventListener('popstate', function() {
       history.pushState(null, '', location.href);
-      window.location.replace('https://pay.hotmart.com/R104643182T?checkoutMode=10');
+      window.location.replace(CHECKOUT);
     });
   </script>
 </body>
